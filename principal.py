@@ -1,7 +1,4 @@
-arquivo_contato = open('dados/contatos.csv')
+arquivo_contato = open('dados/contatos.csv', encoding='latin_1')
 
-conteudo = arquivo_contato.readline(0, @)
-
-print(conteudo)
-#ctrol + shift + p 
-#ctrol+ k / ctrol +c(U)
+for linha in arquivo_contato:
+    print(linha, end= '')
