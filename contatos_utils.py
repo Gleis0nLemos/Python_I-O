@@ -1,5 +1,6 @@
 import csv, pickle, json
 from contato import Contato
+from abc import ABC, abstractmethod
 
 
 def csv_para_contatos(caminho, encoding='latin_1'):
@@ -32,11 +33,12 @@ def pickle_para_contatos(caminho):
 
 def contatos_para_json(contatos, caminho):
     with open(caminho, mode='w') as arquivo:
-        json.dump(contatos, arquivo, default=_contato_para_json)
+        json.dump(contatos, arquivo, default=lambda contato: contato.__dict__)
 
-
-def _contato_para_json(contato):
-    return contato.__dict__
+#o parametro 'defaut' serve para receber um objeto invocável, podendo assim receber uma função(lambda)/função sem nome,
+#podendo assim fazer o chamado dict, como mostrado em 'contatos_para_json, logo acima. O def abaixo tem exatamente a mesma chama de 'lambda'
+#def _contato_para_json(contato):
+     #return contato.__dict__
 
 
 def json_para_contatos(caminho):
@@ -52,3 +54,32 @@ def json_para_contatos(caminho):
     return contatos
 
 
+class ContatoDao(ABC):
+
+    @abstractmethod
+    def buscar_todos(self, caminho):
+        pass
+
+    @abstractmethod
+    def salvar(self, contatos, caminho):
+        pass
+
+
+class ContatoDaoJSON(ContatoDao):
+
+    @abstractmethod
+    def buscar_todos(self, caminho):
+        contatos = []
+        with open(caminho, mode='r') as arquivo:
+            contatos_json = json.load(arquivo)
+            for contato in contatos_json:
+                        c = Contato(**contato)
+                        contatos.append(c)
+
+        return contatos   
+
+
+    @abstractmethod
+    def salvar(self, contatos, caminho):
+        with open(caminho, mode='w') as arquivo:
+            json.dump(contatos, arquivo, default=lambda objeto: objeto.__dict__) 
